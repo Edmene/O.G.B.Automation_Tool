@@ -68,16 +68,16 @@ keyup Shift_L
                                 Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                                             
                             def _kill_glxosd(t):
                                 time.sleep(t)
-                                Benchmark.keypress("")                                                    
+                                Benchmark.keypress(self, "")                                                    
                                 os.system("killall xterm")
                             if(wait == "n"):
                                 threading.Thread(target=_glxosd())                            
-                                Benchmark.keypress(wait)
+                                Benchmark.keypress(self, wait)
                                 _kill_glxosd(t)                            
                             if(wait == "y"):
                                 t=t+30
                                 threading.Thread(target=_glxosd())
-                                Benchmark.keypress(wait)                            
+                                Benchmark.keypress(self, wait)                            
                                 _kill_glxosd(t)
                             
                         benchmark_file = os.listdir("/tmp")[0]

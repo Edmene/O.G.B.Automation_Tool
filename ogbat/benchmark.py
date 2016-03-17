@@ -6,17 +6,10 @@ import installed_games
 import glob
 
 class Benchmark(object):
-    '''
-    classdocs
-    '''
-
 
     def __init__(self):
         self.benchmark=self._launch_game()
-        '''
-        Constructor
-        '''
-        
+       
     def keypress(self, delay):
         if(delay == "y"):
             time.sleep(50)

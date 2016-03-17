@@ -80,7 +80,7 @@ keyup Shift_L
                                 Benchmark.keypress(wait)                            
                                 _kill_glxosd(t)
                             
-                        benchmark_file = min(glob.iglob("/tmp/*.csv"), key=os.path.getctime)
+                        benchmark_file = os.listdir("/tmp")[0]
                         return benchmark_file
                     else:
                         if(t < 60):
@@ -104,4 +104,4 @@ keyup Shift_L
       
 if __name__ == '__main__':
     bench = Benchmark()
-    print (bench)
+    print (bench.benchmark)

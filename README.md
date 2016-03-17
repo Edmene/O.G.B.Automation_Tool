@@ -15,7 +15,6 @@ This tool was created to with the goal of automate the upload of benchmarks to O
  <li>os</li>
  <li>time</li>
  <li>threading</li>
- <li>glob</li>
 </ul>
 <h4>Other needed software:</h4>
 <ul>

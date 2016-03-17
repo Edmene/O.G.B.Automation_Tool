@@ -19,5 +19,5 @@ This tool was created to with the goal of automate the upload of benchmarks to O
 </ul>
 <h4>Other needed software:</h4>
 <ul>
- <li>Xautomation(xte)
+ <li>Xautomation(xte)</li>
 </ul>

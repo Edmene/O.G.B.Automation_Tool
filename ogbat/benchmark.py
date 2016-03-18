@@ -3,13 +3,13 @@ import time
 from subprocess import Popen, PIPE
 import threading
 import installed_games
-import glob
+import re
 
 class Benchmark(object):
-
+   
     def __init__(self):
         self.benchmark=self._launch_game()
-       
+        
     def keypress(self, delay):
         if(delay == "y"):
             time.sleep(50)
@@ -26,6 +26,17 @@ keyup Shift_L
         
     def _launch_game(self):
         g = installed_games.InstalledGames._games(self)
+        f = open("options.conf", 'r')
+        for line in f:
+            if(re.match("Seconds",str(line))):
+                seconds=str(line)                
+                seconds=re.sub("SecondsToDelay:","",seconds)
+                delay=int(seconds)
+            if(re.match("Voglperf",str(line))):
+                voglperf=str(line)                
+                voglperf=re.sub("Voglperf:","",voglperf)
+                voglperf=re.sub("\n", "",voglperf)
+        f.close()
         options=["voglperf","glxosd"]
         wait=""
         print ("Benchmark tools")
@@ -48,39 +59,40 @@ keyup Shift_L
                 if(s >= 0 and s <= len(g[1])):
                     t = input("How long will be the benchmark? (seconds[60-300]):")
                     t=int(t)
-                    print ("Glxosd method have a standard time dalay, 'y' option increment it to 50 seconds")
-                    while(wait != "y" and wait != "n"):                    
-                        wait = input("Do you want to wait 30 seconds to start? y/n:").lower()                                                                 
                     if(t >= 60 and t <= 300):
-                        if(m == 0 and wait == "n"):
-                            sb=Popen(['/home/$USER/Downloads/voglperf-master/bin/voglperfrun32 -x -l '+g[0][s]], stdin=PIPE, shell=True)
-                            time.sleep(t)
-                            os.system("killall xterm")
-                        if(m == 0 and wait == "y"):
-                            sb=Popen(['/home/$USER/Downloads/voglperf-master/bin/voglperfrun32 -x '+g[0][s]], stdin=PIPE, shell=True)
-                            time.sleep(30)
-                            sb.stdin.write(bytes(("logfile start "+str(t)).encode("utf-8")))
-                            sb.stdin.close()
-                            time.sleep(t)
-                            os.system("killall xterm")
+                        print ("Glxosd method have a standard time dalay, 'y' option increment it to "+str(30+delay)+" seconds")
+                        while(wait != "y" and wait != "n"):                    
+                            wait = input("Do you want to wait "+str(delay)+" seconds to start? y/n:").lower()
+                        if(m == 0): 
+                            if(wait == "n"):
+                                sb=Popen([voglperf+' -x -l '+g[0][s]], stdin=PIPE, shell=True)
+                                time.sleep(t)
+                                os.system("killall xterm")
+                            if(wait == "y"):
+                                sb=Popen([voglperf+' -x '+g[0][s]], stdin=PIPE, shell=True)
+                                time.sleep(delay)
+                                sb.stdin.write(bytes(("logfile start "+str(t)).encode("utf-8")))
+                                sb.stdin.close()
+                                time.sleep(t)
+                                os.system("killall xterm")
                         if(m == 1):                       
                             def _glxosd():
-                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                                             
+                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                                              
                             def _kill_glxosd(t):
                                 time.sleep(t)
                                 Benchmark.keypress(self, "")                                                    
                                 os.system("killall xterm")
                             if(wait == "n"):
-                                threading.Thread(target=_glxosd())                            
+                                threading.Thread(target=_glxosd())                                                            
                                 Benchmark.keypress(self, wait)
                                 _kill_glxosd(t)                            
                             if(wait == "y"):
-                                t=t+30
+                                t=t+delay
                                 threading.Thread(target=_glxosd())
                                 Benchmark.keypress(self, wait)                            
                                 _kill_glxosd(t)
-                            
-                        benchmark_file = os.listdir("/tmp")[0]
+                                                            
+                        benchmark_file = os.listdir("/tmp")[0]                        
                         return benchmark_file
                     else:
                         if(t < 60):
@@ -104,4 +116,3 @@ keyup Shift_L
       
 if __name__ == '__main__':
     bench = Benchmark()
-    print (bench.benchmark)

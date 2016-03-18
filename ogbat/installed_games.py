@@ -11,9 +11,25 @@ class InstalledGames(object):
         
     
     def _games(self):
-        gamesString = str(subprocess.getoutput("ls -a /media/Backup/steamapps/ | grep appmanifest"))
-        gamesString = re.sub("[^0-9^\n]*", "",gamesString)
-        games=gamesString.split("\n")
+        games=""
+        f = open("options.conf", 'r')
+        for line in f:
+            if(re.match("Steam",str(line))):
+                directories=str(line) 
+                directories=re.sub("SteamDirectories:", "", directories)
+                directory=directories.split(",")               
+        f.close()
+        for a in range(0, len(directory)):
+            command="ls "+directory[a]+" | grep appmanifest"
+            command=re.sub("\n", "", command)
+            gamesString = str(subprocess.getoutput(command))
+            gamesString = re.sub("[^0-9^\n]*", "",gamesString)
+            #print (gamesString)
+            if(len(games) == 0):
+                games=gamesString.split("\n")
+            else:
+                games=games+gamesString.split("\n")                
+            
         gamesNames = list()
         i=0
         while i < len(games):            
@@ -34,6 +50,3 @@ class InstalledGames(object):
             i=1+i    
         return games, gamesNames  
             
-         
-      
-    

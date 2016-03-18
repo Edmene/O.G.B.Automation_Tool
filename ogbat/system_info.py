@@ -49,12 +49,18 @@ class SystemInformations:
         gpuMem=re.sub("k.*", "", gpuMem)
         gpuMem=str(int(gpuMem)/1024)+"MB"        
         try:
+            #vendor = str(subprocess.getoutput("grep 'Creating default' /var/log/Xorg.0.log"))
             vendor = str(subprocess.getoutput("lspci -v | grep 'VGA compatible controller:'"))
             vendor = re.sub("0[0-9].[0-9].\.[0-9] VGA compatible controller*: ", "", vendor)
             vendor = vendor[0:8]
             vendor = re.sub(" .*","",vendor)       
             if(vendor == "Advanced"):
                 vendor="AMD"
+            if(vendor == "Intel"):
+                gpuCard=str(subprocess.getoutput("grep 'Integrated' /var/log/Xorg.0.log"))
+                gpuCard=re.sub("Integrated Graphics Chipset: ","",gpuCard)
+                gpuCard=re.sub("\(R\)","",gpuCard)
+                driverType="Opensource"
             if(vendor == "NVIDIA"):
                 gpu = str(subprocess.getoutput("nvidia-smi | grep Driver"))
                 gpuDriver = gpu[12:20]
@@ -62,16 +68,25 @@ class SystemInformations:
                 gpu = str(subprocess.getoutput("nvidia-smi | grep GeForce"))
                 gpuCard = gpu[5:27]
                 gpuCard="NVidia "+trim_whitespace(gpuCard)
+                driverType="Proprietary"
             else:
                 gpu = str(subprocess.getoutput("fglrxinfo | grep Radeon"))
-                gpuCard = gpu[28]
-                gpuCard=trim_whitespace(gpuCard)
-                gpu = str(subprocess.getoutput("nvidia-smi | grep version"))
-                gpuDriver = gpu[23:37]
-                gpuDriver = re.sub("[a-z].*[A-Z].*","", gpuDriver)
-                gpuDriver=trim_whitespace(gpuDriver)                    
+                if(len(gpu) == 0):
+                    gpu=str(subprocess.getoutput("lspci -v | grep Radeon"))
+                    gpu=re.sub("^(\[Radeon .*\] )", "", gpu)
+                    gpuCard=re.sub("$\[\]","",gpu)
+                    driverType="Opensource"
+                    gpuDriver=""
+                else:
+                    gpuCard = gpu[28]
+                    gpuCard=trim_whitespace(gpuCard)
+                    driverType="Proprietary"
+                    gpu = str(subprocess.getoutput("fglrxinfo | grep version"))
+                    gpuDriver = gpu[23:37]
+                    gpuDriver = re.sub("[a-z].*[A-Z].*","", gpuDriver)
+                    gpuDriver=trim_whitespace(gpuDriver)                    
         except:
-            if(vendor != "AMD"):
+            if(vendor != "AMD" and "Intel"):
                 vendor = "NVIDIA"    
             else:
                 vendor = "AMD"                

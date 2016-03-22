@@ -111,8 +111,3 @@ keyup Shift_L
             return 0         
         except KeyboardInterrupt:
             return 0
-    
-        
-      
-if __name__ == '__main__':
-    bench = Benchmark()

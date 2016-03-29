@@ -24,7 +24,6 @@ class InstalledGames(object):
             command=re.sub("\n", "", command)
             gamesString = str(subprocess.getoutput(command))
             gamesString = re.sub("[^0-9^\n]*", "",gamesString)
-            #print (gamesString)
             if(len(games) == 0):
                 games=gamesString.split("\n")
             else:

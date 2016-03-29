@@ -7,9 +7,9 @@ parser.add_argument("option", help="Select what the tool should do (benchmark[b]
 args = parser.parse_args()
 if(args.option == "s"):
     system = system_info.SystemInformations()
-    print ("CPU: "+system.cpu+"Kernel: "+system.kernelV+"\nMemory: "+system.memory+
-           "\nGPU: "+system.gpu[0]+"\nGPU Driver: "+system.gpu[1]+"\nGPU Driver Type: "+system.gpu[2]+
-           "\nGPU Memory: "+system.gpu[3]+"\nDesktop: "+system.desktopEnv+"\nResolution:"+system.resolution)
+    print ("CPU: "+str(system.cpu)+"\nSystem: "+str(system.system)+"\nKernel: "+str(system.kernelV)+"\nMemory: "+str(system.memory)+
+            "\nGPU: "+str(system.gpu[0])+"\nGPU Driver: "+str(system.gpu[1])+"\nGPU Driver Type: "+str(system.gpu[2])+
+            "\nGPU Memory: "+str(system.gpu[3])+"\nDesktop: "+str(system.desktopEnv)+"\nResolution:"+str(system.resolution))
     
 elif(args.option == "b"):
     benchmark = benchmark.Benchmark._launch_game("")

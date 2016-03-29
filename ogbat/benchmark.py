@@ -4,11 +4,16 @@ from subprocess import Popen, PIPE
 import threading
 import installed_games
 import re
+import platform
 
 class Benchmark(object):
    
     def __init__(self):
         self.benchmark=self._launch_game()
+        
+    def _platform(self):
+        sys_type = platform.system()
+        return sys_type
         
     def keypress(self, delay):
         if(delay == "y"):
@@ -23,6 +28,11 @@ keyup Shift_L
         p.stdin.write(bytes(keys.encode(encoding='utf_8', errors='strict')))  
         p.stdin.close()
         os.system("killall xte")
+        
+    def _kill_glxosd(self, duration):
+        time.sleep(duration)
+        Benchmark.keypress(self, "")                                                    
+        os.system("killall xterm")
         
     def _launch_game(self):
         g = installed_games.InstalledGames._games(self)
@@ -65,33 +75,24 @@ keyup Shift_L
                             wait = input("Do you want to wait "+str(delay)+" seconds to start? y/n:").lower()
                         if(m == 0): 
                             if(wait == "n"):
-                                sb=Popen([voglperf+' -x -l '+g[0][s]], stdin=PIPE, shell=True)
-                                time.sleep(t)
-                                os.system("killall xterm")
+                                sb=Popen([voglperf+' -x -l '+g[0][s]], stdin=PIPE, shell=True)                                
                             if(wait == "y"):
                                 sb=Popen([voglperf+' -x '+g[0][s]], stdin=PIPE, shell=True)
                                 time.sleep(delay)
                                 sb.stdin.write(bytes(("logfile start "+str(t)).encode("utf-8")))
                                 sb.stdin.close()
-                                time.sleep(t)
-                                os.system("killall xterm")
+                            time.sleep(t)
+                            os.system("killall xterm")
+                            #exit
                         if(m == 1):                       
                             def _glxosd():
-                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                                              
-                            def _kill_glxosd(t):
-                                time.sleep(t)
-                                Benchmark.keypress(self, "")                                                    
-                                os.system("killall xterm")
-                            if(wait == "n"):
-                                threading.Thread(target=_glxosd())                                                            
-                                Benchmark.keypress(self, wait)
-                                _kill_glxosd(t)                            
+                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                
                             if(wait == "y"):
                                 t=t+delay
-                                threading.Thread(target=_glxosd())
-                                Benchmark.keypress(self, wait)                            
-                                _kill_glxosd(t)
-                                                            
+                            else:
+                                threading.Thread(target=_glxosd())                                                            
+                                Benchmark.keypress(self, wait)
+                                Benchmark._kill_glxosd(self, t)
                         benchmark_file = os.listdir("/tmp")[0]                        
                         return benchmark_file
                     else:
@@ -100,6 +101,7 @@ keyup Shift_L
                         else:
                             otherInfo=" Over maximum time."
                         print ("Invalid time."+otherInfo)
+                        return 0
                 else:
                     print ("Invalid game option.")
                     return 0

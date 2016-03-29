@@ -205,6 +205,3 @@ class SystemInformations:
         totalResolution = str(width)+"x"+str(heigth)
         return totalResolution
     
-if __name__ == '__main__':
-    print(SystemInformations())
-    

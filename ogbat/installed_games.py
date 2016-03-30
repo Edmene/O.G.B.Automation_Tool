@@ -2,6 +2,7 @@ import re
 import subprocess
 from bs4 import BeautifulSoup
 import urllib.request as urllib2
+import platform
 
 
 class InstalledGames(object):  
@@ -20,10 +21,20 @@ class InstalledGames(object):
                 directory=directories.split(",")               
         f.close()
         for a in range(0, len(directory)):
-            command="ls "+directory[a]+" | grep appmanifest"
+            if(platform.system() != "Windows"):
+                command="ls "+directory[a]+" | grep appmanifest"
+            else:
+                command='dir '+directory[a]+' | find "appmanifest"'
             command=re.sub("\n", "", command)
             gamesString = str(subprocess.getoutput(command))
-            gamesString = re.sub("[^0-9^\n]*", "",gamesString)
+            if(platform.system() != "Windows"):
+                gamesString = re.sub("[^0-9^\n]*", "",gamesString)
+            else:
+                gamesString = re.sub("[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]  ", "",gamesString)
+                gamesString = re.sub("[0-9][0-9]:[0-9][0-9]", "",gamesString)
+                gamesString = re.sub(" *", "",gamesString)
+                gamesString = re.sub("[0-9]*a", "",gamesString)
+                gamesString = re.sub("[^0-9^\n]*", "",gamesString)
             if(len(games) == 0):
                 games=gamesString.split("\n")
             else:
@@ -41,7 +52,10 @@ class InstalledGames(object):
        'Connection': 'keep-alive'}
             req = urllib2.Request(url,headers=header)
             page = urllib2.urlopen(req)
-            soup = BeautifulSoup(page, "lxml")
+            if(platform.system() != "Windows"):
+                soup = BeautifulSoup(page, "lxml")
+            else:
+                soup = BeautifulSoup(page, "html.parser")
             title = str((soup.find("title").text).encode('ascii', 'ignore'))
             title=re.sub("  A.*", "", title)
             title=re.sub("b'", "", title)                    

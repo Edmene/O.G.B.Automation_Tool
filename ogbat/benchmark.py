@@ -4,22 +4,17 @@ from subprocess import Popen, PIPE
 import threading
 import installed_games
 import re
-import platform
 
 class Benchmark(object):
    
     def __init__(self):
         self.benchmark=self._launch_game()
         
-    def _platform(self):
-        sys_type = platform.system()
-        return sys_type
-        
-    def keypress(self, delay):
+    def keypress(self, delay, extra_time):
         if(delay == "y"):
-            time.sleep(50)
+            time.sleep(30+extra_time)
         if(delay == "n"):
-            time.sleep(20)                                
+            time.sleep(30)                                
         keys = '''keydown Shift_L
 key F9
 keyup Shift_L
@@ -27,7 +22,7 @@ keyup Shift_L
         p = Popen(['xte'], stdin=PIPE, shell=True)
         p.stdin.write(bytes(keys.encode(encoding='utf_8', errors='strict')))  
         p.stdin.close()
-        os.system("killall xte")
+        p.terminate()
         
     def _kill_glxosd(self, duration):
         time.sleep(duration)
@@ -35,6 +30,8 @@ keyup Shift_L
         os.system("killall xterm")
         
     def _launch_game(self):
+        options=["voglperf","glxosd"]
+        wait=""
         g = installed_games.InstalledGames._games(self)
         f = open("options.conf", 'r')
         for line in f:
@@ -46,9 +43,7 @@ keyup Shift_L
                 voglperf=str(line)                
                 voglperf=re.sub("Voglperf:","",voglperf)
                 voglperf=re.sub("\n", "",voglperf)
-        f.close()
-        options=["voglperf","glxosd"]
-        wait=""
+        f.close()        
         print ("Benchmark tools")
         i=0
         for a in range(0, 2):
@@ -89,10 +84,9 @@ keyup Shift_L
                                 Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                
                             if(wait == "y"):
                                 t=t+delay
-                            else:
-                                threading.Thread(target=_glxosd())                                                            
-                                Benchmark.keypress(self, wait)
-                                Benchmark._kill_glxosd(self, t)
+                            threading.Thread(target=_glxosd())                                                         
+                            Benchmark.keypress(self, wait, delay)
+                            Benchmark._kill_glxosd(self, t)
                         benchmark_file = os.listdir("/tmp")[0]                        
                         return benchmark_file
                     else:

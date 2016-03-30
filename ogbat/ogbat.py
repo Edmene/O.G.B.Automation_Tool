@@ -1,6 +1,8 @@
 import argparse
 import system_info
 import benchmark
+import benchmark_windows
+import platform
 
 parser = argparse.ArgumentParser()
 parser.add_argument("option", help="Select what the tool should do (benchmark[b] or sysinfo[s])")
@@ -12,5 +14,8 @@ if(args.option == "s"):
             "\nGPU Memory: "+str(system.gpu[3])+"\nDesktop: "+str(system.desktopEnv)+"\nResolution:"+str(system.resolution))
     
 elif(args.option == "b"):
-    benchmark = benchmark.Benchmark._launch_game("")
+    if(platform.system() != "Windows"):
+        benchmark = benchmark.Benchmark._launch_game("")
+    else:
+        benchmark = benchmark_windows.Benchmark._launch_game("")
     

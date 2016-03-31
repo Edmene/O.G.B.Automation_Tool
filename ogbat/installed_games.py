@@ -1,9 +1,8 @@
 import re
 import subprocess
 from bs4 import BeautifulSoup
-import urllib.request as urllib2
+import urllib.request as request
 import platform
-
 
 class InstalledGames(object):  
     
@@ -44,22 +43,32 @@ class InstalledGames(object):
         i=0
         while i < len(games):            
             url = "https://steamdb.info/app/"+games[i]+"/"
+            print(url) 
             header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-       'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-       'Accept-Encoding': 'none',
-       'Accept-Language': 'en-US,en;q=0.8',
-       'Connection': 'keep-alive'}
-            req = urllib2.Request(url,headers=header)
-            page = urllib2.urlopen(req)
-            if(platform.system() != "Windows"):
-                soup = BeautifulSoup(page, "lxml")
-            else:
-                soup = BeautifulSoup(page, "html.parser")
-            title = str((soup.find("title").text).encode('ascii', 'ignore'))
-            title=re.sub("  A.*", "", title)
-            title=re.sub("b'", "", title)                    
-            gamesNames.insert(i, title)                       
-            i=1+i    
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                        'Accept-Encoding': 'none',
+                        'Accept-Language': 'en-US,en;q=0.8',
+                        'Connection': 'keep-alive'}            
+            try:
+                req = request.Request(url,headers=header)
+                page = request.urlopen(req)            
+                if(platform.system() != "Windows"):
+                    soup = BeautifulSoup(page, "lxml")
+                else:
+                    soup = BeautifulSoup(page, "html.parser")
+                title = str((soup.find("title").text).encode('ascii', 'ignore'))
+                title=re.sub("  A.*", "", title)
+                title=re.sub("b'", "", title)                    
+                gamesNames.insert(i, title)
+                print(gamesNames)                       
+                i=1+i
+            except:
+                pass
+                games.remove(games[i])   
         return games, gamesNames  
             
+if __name__ == '__main__':
+    games=InstalledGames._games("")
+    print(games)    
+    

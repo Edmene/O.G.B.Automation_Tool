@@ -25,12 +25,12 @@ class SystemInformations:
             distro=re.sub("NAME=\"", "", distro)
             distro=re.sub("\"", "", distro)
         else:
-            kernelV=subprocess.getoutput("systeminfo")
-            kernelV=re.findall("Windows [0-9]", kernelV)
-            if(len(kernelV) == 0):
-                kernelV=re.findall("Windows [A-Z][a-z].*", kernelV)
-            kernelV = re.sub("\[\'", "", kernelV[0])
-            kernelV = re.sub("\'\]", "", kernelV)
+            distro=subprocess.getoutput("systeminfo")
+            distro=re.findall("Windows [0-9]", distro)
+            if(len(distro) == 0):
+                distro=re.findall("Windows [A-Z][a-z].*", distro)
+            distro = re.sub("\[\'", "", distro[0])
+            distro = re.sub("\'\]", "", distro)
         return distro
         
     def _kernel(self):

@@ -4,24 +4,20 @@ from subprocess import Popen, PIPE
 import threading
 import installed_games
 import re
-import pywinauto
+import win32com.client
 
 class Benchmark(object):
    
     def __init__(self):
         self.benchmark=self._launch_game()
         
-    def keypress(self, delay, extra_time, t, path):
+    def keypress(self, delay, extra_time, t):        
+        script = win32com.client.Dispatch("WScript.Shell")        
         if(delay == "y"):
             time.sleep(30+extra_time)
         if(delay == "n"):
             time.sleep(30)
-        p = pywinauto.Application.start(r""+path+"\fraps.exe")        
-        p.TypeKeys("{F11}")
-        time.sleep(t)
-        p.TypeKeys("{F11}")          
-        os.system("taskkill /IM fraps.exe") 
-        
+        script.SendKeys("{F11}")     
     def _launch_game(self):
         wait=""
         g = installed_games.InstalledGames._games(self)
@@ -51,15 +47,23 @@ class Benchmark(object):
                     print ("Fraps method have a standard time dalay, 'y' option increment it to "+str(30+delay)+" seconds")
                     while(wait != "y" and wait != "n"):                    
                         wait = input("Do you want to wait "+str(delay)+" seconds to start? y/n:").lower()
-                    game = Popen(["steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)  
                     if(wait == "y"):
-                        t=t+delay
-                    threading.Thread(target=Benchmark.keypress(self, wait, delay, t, fraps))                    
-                    time.sleep(t+2)
-                    game.terminate()
-                            #exit                        
-                    benchmark_file = os.listdir(fraps+"\Benchmarks")[0]                        
-                    return benchmark_file
+                        t=t+delay 
+                    game=Popen(["cmd"], stdin=PIPE, shell=True)
+                    command=('start steam://rungameid/'+g[0][s]+'\n').encode("utf-8")
+                    game.stdin.write(bytes(command))
+                    game.stdin.close()
+                    Popen([fraps+"fraps.exe"], stdin=PIPE, shell=True)                   
+                    threading.Thread(target=Benchmark.keypress("", wait, delay, t))
+                            #exit
+                    time.sleep(t)
+                    threading.Thread(target=Benchmark.keypress("", "", "", t))
+                    files = os.listdir(fraps+"Benchmarks")
+                    if(re.search(".txt", files[0]) == None):                                                
+                        benchmark_file = files[0]                    
+                    else:
+                        benchmark_file = files[(len(files)-1)]                     
+                    return benchmark_file, fraps
                 else:
                     if(t < 60):
                         otherInfo=" Bellow minimal time."

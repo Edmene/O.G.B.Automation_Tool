@@ -4,7 +4,6 @@ from subprocess import Popen, PIPE
 import threading
 import installed_games
 import re
-import win32com.client
 
 class Benchmark(object):
    
@@ -58,11 +57,13 @@ class Benchmark(object):
                             #exit
                     time.sleep(t)
                     threading.Thread(target=Benchmark.keypress("", "", "", t))
-                    files = os.listdir(fraps+"Benchmarks")
-                    if(re.search(".txt", files[0]) == None):                                                
-                        benchmark_file = files[0]                    
-                    else:
-                        benchmark_file = files[(len(files)-1)]                     
+                    a=0
+                    files=os.listdir(fraps+"benchmarks")
+                    benchmark_file=""
+                    for a in range (len(files, 0, -1)):
+                        if(re.search(".csv", files[a])):
+                            benchmark_file = files[a]
+                            break                     
                     return benchmark_file, fraps
                 else:
                     if(t < 60):

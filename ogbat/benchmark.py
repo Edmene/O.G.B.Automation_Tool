@@ -22,34 +22,33 @@ keyup Shift_L
         p = Popen(['xte'], stdin=PIPE, shell=True)
         p.stdin.write(bytes(keys.encode(encoding='utf_8', errors='strict')))  
         p.stdin.close()
-        p.terminate()
         
     def _kill_glxosd(self, duration):
         time.sleep(duration)
-        Benchmark.keypress(self, "")                                                    
+        Benchmark.keypress(self, "", "")                                                    
         os.system("killall xterm")
         
     def _launch_game(self):
         options=["voglperf","glxosd"]
         wait=""
         g = installed_games.InstalledGames._games(self)
-        f = open("options.conf", 'r')
-        for line in f:
-            if(re.match("Seconds",str(line))):
-                seconds=str(line)                
-                seconds=re.sub("SecondsToDelay:","",seconds)
-                delay=int(seconds)
-            if(re.match("Voglperf",str(line))):
-                voglperf=str(line)                
-                voglperf=re.sub("Voglperf:","",voglperf)
-                voglperf=re.sub("\n", "",voglperf)
-        f.close()        
-        print ("Benchmark tools")
-        i=0
-        for a in range(0, 2):
-            print(str(i)+") "+options[a])
-            i=i+1
         try:
+            f = open("options.conf", 'r')
+            for line in f:
+                if(re.match("Seconds",str(line))):
+                    seconds=str(line)                
+                    seconds=re.sub("SecondsToDelay:","",seconds)
+                    delay=int(seconds)
+                if(re.match("Voglperf",str(line))):
+                    voglperf=str(line)                
+                    voglperf=re.sub("Voglperf:","",voglperf)
+                    voglperf=re.sub("\n", "",voglperf)
+            f.close()        
+            print ("Benchmark tools")
+            i=0
+            for a in range(0, 2):
+                print(str(i)+") "+options[a])
+                i=i+1        
             method = input("Choice:")
             m=int(method)
             if(m >= 0 and m <= 1): #glxosd selection
@@ -68,7 +67,8 @@ keyup Shift_L
                         print ("Glxosd method have a standard time dalay, 'y' option increment it to "+str(30+delay)+" seconds")
                         while(wait != "y" and wait != "n"):                    
                             wait = input("Do you want to wait "+str(delay)+" seconds to start? y/n:").lower()
-                        if(m == 0): 
+                        if(m == 0):
+                            file_type=".csv" 
                             if(wait == "n"):
                                 sb=Popen([voglperf+' -x -l '+g[0][s]], stdin=PIPE, shell=True)                                
                             if(wait == "y"):
@@ -77,17 +77,25 @@ keyup Shift_L
                                 sb.stdin.write(bytes(("logfile start "+str(t)).encode("utf-8")))
                                 sb.stdin.close()
                             time.sleep(t)
-                            os.system("killall xterm")
+                            sb.terminate()
+                            os.system("killall xterm")                            
                             #exit
-                        if(m == 1):                       
+                        if(m == 1):
+                            file_type=".log"                       
                             def _glxosd():
-                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                
+                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                                      
                             if(wait == "y"):
                                 t=t+delay
                             threading.Thread(target=_glxosd())                                                         
                             Benchmark.keypress(self, wait, delay)
-                            Benchmark._kill_glxosd(self, t)
-                        benchmark_file = os.listdir("/tmp")[0]                        
+                            threading.Thread(target=Benchmark._kill_glxosd(self, t))                            
+                        a=0
+                        files=os.listdir("/tmp")
+                        benchmark_file=""                            
+                        for a in range (0,len(files)):
+                            if(re.search(file_type, files[a])):
+                                benchmark_file = files[a]
+                                break                                                   
                         return benchmark_file
                     else:
                         if(t < 60):
@@ -102,8 +110,8 @@ keyup Shift_L
             else:
                 print ("Invalid tool option.")
                 return 0
-        except(ValueError):
+        except ValueError:
             print("Appears that you inserted a invalid option.")
-            return 0         
+            return 0                 
         except KeyboardInterrupt:
-            return 0
+            return 0           

@@ -2,8 +2,9 @@ import os
 import time
 from subprocess import Popen, PIPE
 import threading
-import installed_games
+import sqlite3
 import re
+import installed_games
 
 class Benchmark(object):
    
@@ -31,7 +32,12 @@ keyup Shift_L
     def _launch_game(self):
         options=["voglperf","glxosd"]
         wait=""
-        g = installed_games.InstalledGames._games(self)
+        installed_games.InstalledGames._games(self)
+        conn = sqlite3.connect('ogbatdb.db')
+        c=conn.cursor()
+        c.execute("SELECT stdb_game,name_game FROM game")
+        g=c.fetchall()
+        conn.close()
         try:
             f = open("options.conf", 'r')
             for line in f:
@@ -55,12 +61,12 @@ keyup Shift_L
             #if(m == 0):            
                 print ("Select the game to run")
                 i=0
-                for a in range(0, len(g[1])):
-                    print(str(i)+") "+g[1][a])
+                for a in range(0, len(g)):
+                    print(str(i)+") "+g[a][1])
                     i=i+1    
                 s = input("Choice: ")
                 s=int(s)
-                if(s >= 0 and s <= len(g[1])):
+                if(s >= 0 and s <= len(g)):
                     t = input("How long will be the benchmark? (seconds[60-300]):")
                     t=int(t)
                     if(t >= 60 and t <= 300):
@@ -70,9 +76,9 @@ keyup Shift_L
                         if(m == 0):
                             file_type=".csv" 
                             if(wait == "n"):
-                                sb=Popen([voglperf+' -x -l '+g[0][s]], stdin=PIPE, shell=True)                                
+                                sb=Popen([voglperf+' -x -l '+str(g[s][0])], stdin=PIPE, shell=True)                                
                             if(wait == "y"):
-                                sb=Popen([voglperf+' -x '+g[0][s]], stdin=PIPE, shell=True)
+                                sb=Popen([voglperf+' -x '+str(g[s][0])], stdin=PIPE, shell=True)
                                 time.sleep(delay)
                                 sb.stdin.write(bytes(("logfile start "+str(t)).encode("utf-8")))
                                 sb.stdin.close()
@@ -83,7 +89,7 @@ keyup Shift_L
                         if(m == 1):
                             file_type=".log"                       
                             def _glxosd():
-                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+g[0][s]], stdin=PIPE, shell=True)                                                      
+                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+str(g[s][0])], stdin=PIPE, shell=True)                                                      
                             if(wait == "y"):
                                 t=t+delay
                             threading.Thread(target=_glxosd())                                                         

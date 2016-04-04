@@ -16,6 +16,7 @@ This tool was created to with the goal of automate the upload of benchmarks to O
  <li>os</li>
  <li>time</li>
  <li>threading</li>
+ <li>sqlite3</li>
  <h4>Windows specific:</h4>
  <li>pywin32, is also possible to install it by installing pywinauto</li>
 </ul>
@@ -24,6 +25,7 @@ This tool was created to with the goal of automate the upload of benchmarks to O
  <li>Voglperf</li>
  <li>Glxosd</li>
  <li>Xautomation(xte)</li>
+ <li>SQLite</li>
  <h4>Windows specific:</h4>
  <li>Fraps</li>
 </ul>

@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 import threading
 import installed_games
 import re
+import sqlite3
 
 class Benchmark(object):
    
@@ -19,7 +20,12 @@ class Benchmark(object):
         script.SendKeys("{F11}")     
     def _launch_game(self):
         wait=""
-        g = installed_games.InstalledGames._games(self)
+        installed_games.InstalledGames._games(self)
+        conn = sqlite3.connect('ogbatdb.db')
+        c=conn.cursor()
+        c.execute("SELECT stdb_game,name_game FROM game")
+        g=c.fetchall()
+        conn.close()
         f = open("options.conf", 'r')
         for line in f:
             if(re.match("Seconds",str(line))):
@@ -34,12 +40,12 @@ class Benchmark(object):
         try:                      
             print ("Select the game to run")
             i=0
-            for a in range(0, len(g[1])):
-                print(str(i)+") "+g[1][a])
+            for a in range(0, len(g)):
+                print(str(i)+") "+g[a][1])
                 i=i+1    
             s = input("Choice: ")
             s=int(s)
-            if(s >= 0 and s <= len(g[1])):
+            if(s >= 0 and s <= len(g)):
                 t = input("How long will be the benchmark? (seconds[60-300]):")
                 t=int(t)
                 if(t >= 60 and t <= 300):
@@ -49,7 +55,7 @@ class Benchmark(object):
                     if(wait == "y"):
                         t=t+delay 
                     game=Popen(["cmd"], stdin=PIPE, shell=True)
-                    command=('start steam://rungameid/'+g[0][s]+'\n').encode("utf-8")
+                    command=('start steam://rungameid/'+g[s][0]+'\n').encode("utf-8")
                     game.stdin.write(bytes(command))
                     game.stdin.close()
                     Popen([fraps+"fraps.exe"], stdin=PIPE, shell=True)                   

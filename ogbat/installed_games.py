@@ -3,14 +3,22 @@ import subprocess
 from bs4 import BeautifulSoup
 import urllib.request as request
 import platform
+import sqlite3
 
 class InstalledGames(object):  
     
     def __init__(self):
-        self.games=self._games()     
-        
+        self.games=self._games()
     
     def _games(self):
+        conn = sqlite3.connect('ogbatdb.db')
+        c=conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS
+        game (id_game INTEGER PRIMARY KEY,
+        stdb_game INTEGER,
+        name_game BLOB);       
+        ''')
+        conn.commit()        
         games=""
         f = open("options.conf", 'r')
         for line in f:
@@ -37,7 +45,31 @@ class InstalledGames(object):
             if(len(games) == 0):
                 games=gamesString.split("\n")
             else:
-                games=games+gamesString.split("\n")                
+                games=games+gamesString.split("\n")        
+                
+        c.execute('SELECT stdb_game FROM game')        
+        dbIds=c.fetchall()
+        dbIds=list(dbIds)
+            
+        for a in range(0, len(dbIds)):
+            fail=0
+            dbIds[a]=re.sub(",\)","",str(dbIds[a]))
+            dbIds[a]=re.sub("\(","",dbIds[a])
+            for game in games:
+                if(game != dbIds[a]):
+                    fail=fail+1
+            if(fail == len(games)):
+                c.execute("DELETE FROM game WHERE stdb_game=?", [dbIds[a]])
+                conn.commit()
+        
+        gamesIds=list()   
+        for o in range(0,len(games)):                               
+            gamesIds.insert(o, games[o])
+                
+        for o in range(0,len(gamesIds)):                               
+            c.execute("SELECT stdb_game FROM game WHERE stdb_game=?", [gamesIds[o]])
+            if(c.fetchone() != None):
+                games.remove(gamesIds[o])             
             
         gamesNames = list()
         i=0
@@ -59,10 +91,12 @@ class InstalledGames(object):
                 title = str((soup.find("title").text).encode('ascii', 'ignore'))
                 title=re.sub("  A.*", "", title)
                 title=re.sub("b'", "", title)                    
-                gamesNames.insert(i, title)                     
+                gamesNames.insert(i, title)                                    
                 i=1+i
             except:
                 pass
-                games.remove(games[i])   
-        return games, gamesNames
-    
+                games.remove(games[i])
+        for o in range(0,len(games)):                 
+            c.execute("INSERT INTO game VALUES(NULL,"+games[o]+",'"+gamesNames[o]+"');")
+            conn.commit()           
+        conn.close()

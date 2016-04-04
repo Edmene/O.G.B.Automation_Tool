@@ -56,7 +56,7 @@ class Benchmark(object):
                     if(wait == "y"):
                         t=t+delay 
                     game=Popen(["cmd"], stdin=PIPE, shell=True)
-                    command=('start steam://rungameid/'+g[s][0]+'\n').encode("utf-8")
+                    command=('start steam://rungameid/'+str(g[s][0])+'\n').encode("utf-8")
                     game.stdin.write(bytes(command))
                     game.stdin.close()
                     Popen([fraps+"fraps.exe"], stdin=PIPE, shell=True)                   
@@ -64,10 +64,9 @@ class Benchmark(object):
                             #exit
                     time.sleep(t)
                     threading.Thread(target=Benchmark.keypress("", "", "", t))
-                    a=0
                     files=os.listdir(fraps+"benchmarks")
                     benchmark_file=""
-                    for a in range (len(files, 0, -1)):
+                    for a in range (0, len(files)):
                         if(re.search(".csv", files[a])):
                             benchmark_file = files[a]
                             break                     

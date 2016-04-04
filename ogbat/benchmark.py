@@ -94,8 +94,7 @@ keyup Shift_L
                                 t=t+delay
                             threading.Thread(target=_glxosd())                                                         
                             Benchmark.keypress(self, wait, delay)
-                            threading.Thread(target=Benchmark._kill_glxosd(self, t))                            
-                        a=0
+                            threading.Thread(target=Benchmark._kill_glxosd(self, t))
                         files=os.listdir("/tmp")
                         benchmark_file=""                            
                         for a in range (0,len(files)):

@@ -14,8 +14,7 @@ class InstalledGames(object):
         conn = sqlite3.connect('ogbatdb.db')
         c=conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS
-        game (id_game INTEGER PRIMARY KEY,
-        stdb_game INTEGER,
+        game (stdb_game INTEGER,
         name_game BLOB);       
         ''')
         conn.commit()        
@@ -97,6 +96,6 @@ class InstalledGames(object):
                 pass
                 games.remove(games[i])
         for o in range(0,len(games)):                 
-            c.execute("INSERT INTO game VALUES(NULL,"+games[o]+",'"+gamesNames[o]+"');")
+            c.execute("INSERT INTO game VALUES(?,?);", (games[o],gamesNames[o]))
             conn.commit()           
         conn.close()

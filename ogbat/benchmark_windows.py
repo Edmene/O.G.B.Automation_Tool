@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 import threading
 import installed_games
 import re
+import win32com.client
 import sqlite3
 
 class Benchmark(object):

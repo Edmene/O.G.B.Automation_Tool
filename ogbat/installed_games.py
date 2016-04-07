@@ -89,7 +89,9 @@ class InstalledGames(object):
                     soup = BeautifulSoup(page, "html.parser")
                 title = str((soup.find("title").text).encode('ascii', 'ignore'))
                 title=re.sub("  A.*", "", title)
-                title=re.sub("b'", "", title)                    
+                title=re.sub("b\'", "", title)
+                title=re.sub("b\"", "", title)
+                title=re.sub("  .*", "", title)                      
                 gamesNames.insert(i, title)                                    
                 i=1+i
             except:

@@ -30,9 +30,9 @@ keyup Shift_L
         os.system("killall xterm")
         
     def _launch_game(self):
-        options=["voglperf","glxosd"]
+        options=["voglperf","glxosd","voglperf executable"]
         wait=""
-        installed_games.InstalledGames._games(self)
+        installed_games.InstalledGames().games
         conn = sqlite3.connect('ogbatdb.db')
         c=conn.cursor()
         c.execute("SELECT stdb_game,name_game FROM game")
@@ -52,21 +52,23 @@ keyup Shift_L
             f.close()        
             print ("Benchmark tools")
             i=0
-            for a in range(0, 2):
+            for a in range(0, len(options)):
                 print(str(i)+") "+options[a])
                 i=i+1        
             method = input("Choice:")
             m=int(method)
-            if(m >= 0 and m <= 1): #glxosd selection
-            #if(m == 0):            
-                print ("Select the game to run")
-                i=0
-                for a in range(0, len(g)):
-                    print(str(i)+") "+g[a][1])
-                    i=i+1    
-                s = input("Choice: ")
-                s=int(s)
-                if(s >= 0 and s <= len(g)):
+            if(m >= 0 and m <= 2): #glxosd selection
+            #if(m == 0):
+                s=0
+                if(m != 2):            
+                    print ("Select the game to run")
+                    i=0
+                    for a in range(0, len(g)):
+                        print(str(i)+") "+g[a][1])
+                        i=i+1    
+                    s = input("Choice: ")
+                    s=int(s)
+                if((s >= 0 and s <= len(g)) or m == 2):
                     t = input("How long will be the benchmark? (seconds[60-300]):")
                     t=int(t)
                     if(t >= 60 and t <= 300):
@@ -95,6 +97,19 @@ keyup Shift_L
                             threading.Thread(target=_glxosd())                                                         
                             Benchmark.keypress(self, wait, delay)
                             threading.Thread(target=Benchmark._kill_glxosd(self, t))
+                        if(m == 2):
+                            file_type=".csv"
+                            exec_path=input("Type the path to the game executable:") 
+                            if(wait == "n"):
+                                sb=Popen([voglperf+' -x -l '+exec_path], stdin=PIPE, shell=True)                                
+                            if(wait == "y"):
+                                sb=Popen([voglperf+' -x '+exec_path], stdin=PIPE, shell=True)
+                                time.sleep(delay)
+                                sb.stdin.write(bytes(("logfile start "+str(t)).encode("utf-8")))
+                                sb.stdin.close()
+                            time.sleep(t)
+                            sb.terminate()
+                            os.system("killall xterm")
                         files=os.listdir("/tmp")
                         benchmark_file=""                            
                         for a in range (0,len(files)):

@@ -19,12 +19,12 @@ if(args.option == "s"):
     
 elif(args.option == "b"):
     if(platform.system() != "Windows"):
-        benchmark_file = benchmark.Benchmark._launch_game("")        
+        benchmark_file = benchmark.Benchmark().benchmark     
         print(benchmark_file)
         #upload
         #os.remove("/tmp/"+benchmark_file)
     else:
-        benchmark_file = benchmark_windows.Benchmark._launch_game("")
+        benchmark_file = benchmark_windows.Benchmark().benchmark
         print(benchmark_file[0])
         #upload        
         #os.remove(benchmark_file[1]+"/"+benchmark_file[0])  

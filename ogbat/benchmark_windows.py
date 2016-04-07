@@ -21,7 +21,7 @@ class Benchmark(object):
         script.SendKeys("{F11}")     
     def _launch_game(self):
         wait=""
-        installed_games.InstalledGames._games(self)
+        installed_games.InstalledGames().games
         conn = sqlite3.connect('ogbatdb.db')
         c=conn.cursor()
         c.execute("SELECT stdb_game,name_game FROM game")

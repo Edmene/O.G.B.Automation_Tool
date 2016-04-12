@@ -17,7 +17,10 @@ This tool was created to with the goal of automate the upload of benchmarks to O
  <li>time</li>
  <li>threading</li>
  <li>sqlite3</li>
+ <h4>Linux specific:</h4>
+ <li>lxml</li>
  <h4>Windows specific:</h4>
+ <li>html.parser</li>
  <li>pywin32, is also possible to install it by installing pywinauto</li>
 </ul>
 <h4>Other needed software:</h4>

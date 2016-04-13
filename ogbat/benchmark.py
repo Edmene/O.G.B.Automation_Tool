@@ -75,8 +75,8 @@ keyup Shift_L
                         print ("Glxosd method have a standard time dalay, 'y' option increment it to "+str(30+delay)+" seconds")
                         while(wait != "y" and wait != "n"):                    
                             wait = input("Do you want to wait "+str(delay)+" seconds to start? y/n:").lower()
+                        file_type=".csv"
                         if(m == 0):
-                            file_type=".csv" 
                             if(wait == "n"):
                                 sb=Popen([voglperf+' -x -l '+str(g[s][0])], stdin=PIPE, shell=True)                                
                             if(wait == "y"):
@@ -86,19 +86,16 @@ keyup Shift_L
                                 sb.stdin.close()
                             time.sleep(t)
                             sb.terminate()
-                            os.system("killall xterm")                            
-                            #exit
-                        if(m == 1):
-                            file_type=".log"                       
+                            os.system("killall xterm")                     
+                        if(m == 1):                                                   
                             def _glxosd():
-                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+str(g[s][0])], stdin=PIPE, shell=True)                                                      
+                                Popen(["xterm -e glxosd --steam steam steam://rungameid/"+str(g[s][0])], stdin=PIPE, shell=True)                                                      
                             if(wait == "y"):
                                 t=t+delay
                             threading.Thread(target=_glxosd())                                                         
                             Benchmark.keypress(self, wait, delay)
                             threading.Thread(target=Benchmark._kill_glxosd(self, t))
-                        if(m == 2):
-                            file_type=".csv"
+                        if(m == 2):                            
                             exec_path=input("Type the path to the game executable:") 
                             if(wait == "n"):
                                 sb=Popen([voglperf+' -x -l '+exec_path], stdin=PIPE, shell=True)                                

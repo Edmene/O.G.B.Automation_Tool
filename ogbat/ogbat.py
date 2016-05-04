@@ -5,6 +5,7 @@ import benchmark
 if(platform.system() == "Windows"):
     import benchmark_windows
 import subprocess
+import upload
 PIPE=subprocess.PIPE
 Popen=subprocess.Popen
 
@@ -18,14 +19,12 @@ if(args.option == "s"):
             "\nGPU Memory: "+str(system.gpu[3])+"\nDesktop: "+str(system.desktopEnv)+"\nResolution:"+str(system.resolution))
     
 elif(args.option == "b"):
+    benchmark_info=""
     if(platform.system() != "Windows"):
-        benchmark_file = benchmark.Benchmark().benchmark     
-        print(benchmark_file)
-        #upload
-        #os.remove("/tmp/"+benchmark_file)
+        benchmark_file = benchmark.Benchmark().benchmark
+        benchmark_info=["/tmp/"+benchmark_file[0],benchmark_file[1]]        
     else:
         benchmark_file = benchmark_windows.Benchmark().benchmark
-        print(benchmark_file[0])
-        #upload        
-        #os.remove(benchmark_file[1]+"/"+benchmark_file[0])  
-            
+        benchmark_info=[benchmark_file[1]+"/"+benchmark_file[0],benchmark_file[2]]              
+    print("\n")
+    upload.Upload(benchmark_info)            

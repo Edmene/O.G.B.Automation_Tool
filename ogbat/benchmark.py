@@ -75,8 +75,9 @@ keyup Shift_L
                         print ("Glxosd method have a standard time dalay, 'y' option increment it to "+str(30+delay)+" seconds")
                         while(wait != "y" and wait != "n"):                    
                             wait = input("Do you want to wait "+str(delay)+" seconds to start? y/n:").lower()
-                        file_type=".csv"
                         if(m == 0):
+                            file_type=".csv"
+                            game_id=str(g[s][0]) 
                             if(wait == "n"):
                                 sb=Popen([voglperf+' -x -l '+str(g[s][0])], stdin=PIPE, shell=True)                                
                             if(wait == "y"):
@@ -86,16 +87,21 @@ keyup Shift_L
                                 sb.stdin.close()
                             time.sleep(t)
                             sb.terminate()
-                            os.system("killall xterm")                     
-                        if(m == 1):                                                   
+                            os.system("killall xterm")                            
+                            #exit
+                        if(m == 1):
+                            file_type=".csv"
+                            game_id=str(g[s][0])                                                   
                             def _glxosd():
-                                Popen(["xterm -e glxosd --steam steam steam://rungameid/"+str(g[s][0])], stdin=PIPE, shell=True)                                                      
+                                Popen(["xterm -e glxosd -s steam steam://rungameid/"+str(g[s][0])], stdin=PIPE, shell=True)                                                      
                             if(wait == "y"):
                                 t=t+delay
                             threading.Thread(target=_glxosd())                                                         
                             Benchmark.keypress(self, wait, delay)
                             threading.Thread(target=Benchmark._kill_glxosd(self, t))
-                        if(m == 2):                            
+                        if(m == 2):
+                            file_type=".csv"
+                            game_id="ns"
                             exec_path=input("Type the path to the game executable:") 
                             if(wait == "n"):
                                 sb=Popen([voglperf+' -x -l '+exec_path], stdin=PIPE, shell=True)                                
@@ -113,22 +119,20 @@ keyup Shift_L
                             if(re.search(file_type, files[a])):
                                 benchmark_file = files[a]
                                 break                                                   
-                        return benchmark_file
+                        return benchmark_file,game_id
                     else:
                         if(t < 60):
                             otherInfo=" Bellow minimal time."
                         else:
                             otherInfo=" Over maximum time."
                         print ("Invalid time."+otherInfo)
-                        return 0
                 else:
                     print ("Invalid game option.")
-                    return 0
             else:
                 print ("Invalid tool option.")
-                return 0
+        except UnboundLocalError:
+            print("The configuration file appears to be incomplete or don't exists.")
         except ValueError:
-            print("Appears that you inserted a invalid option.")
-            return 0                 
+            print("Appears that you inserted a invalid option.")                
         except KeyboardInterrupt:
-            return 0           
+            pass          

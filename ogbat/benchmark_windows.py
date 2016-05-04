@@ -18,15 +18,26 @@ class Benchmark(object):
             time.sleep(30+extra_time)
         if(delay == "n"):
             time.sleep(30)
-        script.SendKeys("{F11}")     
-    def _launch_game(self):
-        wait=""
+        script.SendKeys("{F11}")
+        
+    def _benchmark_file(self, fraps):
+        files=os.listdir(fraps+"benchmarks")
+        for a in range (0, len(files)):
+            if(re.search(".csv", files[a])):
+                benchmark_file = files[a]
+                break
+        return benchmark_file
+    
+    def _access_db(self):
         installed_games.InstalledGames().games
         conn = sqlite3.connect('ogbatdb.db')
         c=conn.cursor()
         c.execute("SELECT stdb_game,name_game FROM game")
-        g=c.fetchall()
+        games=c.fetchall()
         conn.close()
+        return games
+    
+    def _read_options(self):
         f = open("options.conf", 'r')
         for line in f:
             if(re.match("Seconds",str(line))):
@@ -37,7 +48,13 @@ class Benchmark(object):
                 fraps=str(line)                
                 fraps=re.sub("Fraps:","",fraps)
                 fraps=re.sub("\n", "",fraps)
-        f.close()        
+        f.close()
+        return fraps, delay 
+         
+    def _launch_game(self):
+        wait=""
+        g=Benchmark._access_db_db("")        
+        options=Benchmark._read_options("")       
         try:                      
             print ("Select the game to run")
             i=0
@@ -50,39 +67,34 @@ class Benchmark(object):
                 t = input("How long will be the benchmark? (seconds[60-300]):")
                 t=int(t)
                 if(t >= 60 and t <= 300):
-                    print ("Fraps method have a standard time dalay, 'y' option increment it to "+str(30+delay)+" seconds")
+                    print ("Fraps method have a standard time dalay, 'y' option increment it to "+str(30+options[1])+" seconds")
                     while(wait != "y" and wait != "n"):                    
-                        wait = input("Do you want to wait "+str(delay)+" seconds to start? y/n:").lower()
+                        wait = input("Do you want to wait "+str(options[1])+" seconds to start? y/n:").lower()
                     if(wait == "y"):
-                        t=t+delay 
+                        t=t+options[1] 
                     game=Popen(["cmd"], stdin=PIPE, shell=True)
                     command=('start steam://rungameid/'+str(g[s][0])+'\n').encode("utf-8")
                     game.stdin.write(bytes(command))
                     game.stdin.close()
-                    Popen([fraps+"fraps.exe"], stdin=PIPE, shell=True)                   
-                    threading.Thread(target=Benchmark.keypress("", wait, delay, t))
+                    Popen([options[0]+"fraps.exe"], stdin=PIPE, shell=True)                   
+                    threading.Thread(target=Benchmark.keypress("", wait, options[1], t))
                             #exit
                     time.sleep(t)
                     threading.Thread(target=Benchmark.keypress("", "", "", t))
-                    files=os.listdir(fraps+"benchmarks")
-                    benchmark_file=""
-                    for a in range (0, len(files)):
-                        if(re.search(".csv", files[a])):
-                            benchmark_file = files[a]
-                            break                     
-                    return benchmark_file, fraps
+                    benchmark_file=Benchmark._benchmark_file(self, options[0])                                         
+                    return benchmark_file, options[0], str(g[s][0])
                 else:
                     if(t < 60):
-                        otherInfo=" Bellow minimal time."
+                        additional_info=" Bellow minimal time."
                     else:
-                        otherInfo=" Over maximum time."
-                    print ("Invalid time."+otherInfo)
+                        additional_info=" Over maximum time."
+                    print ("Invalid time."+additional_info)
                     return 0
             else:
-                print ("Invalid game option.")
-                return 0        
-        except(ValueError):
+                print ("Invalid game option.")      
+        except ValueError:
             print("Appears that you inserted a invalid option.")
-            return 0         
+        except UnboundLocalError:
+            print("The configuration file appears to be incomplete or don't exists.")      
         except KeyboardInterrupt:
-            return 0
+            pass

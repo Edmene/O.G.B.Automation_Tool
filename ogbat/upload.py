@@ -12,6 +12,7 @@ class Upload(object):
         self.upload_data=self._upload_data(params)
         #When integrated with the other classes the params attribute should be the file path to the benchmark file and game steam id.
         
+    #Set the system type in the right format for OpenGameBenchmarks.
     def _get_system_information(self):
         linux_distros_types=['Debian-based (Debian, Ubuntu, Mint, Elementary OS, SteamOS)','Arch-based (Arch, Manjaro)',
                     'Red Hat-based (RedHat, Fedora, CentOS)','Gentoo-based (Gentoo, Chromium, Funtoo)','SUSE-based',
@@ -61,6 +62,7 @@ class Upload(object):
         return system_specs, system_information
         
         
+    #The upload process.
     def _upload_data(self, game_info):
         try:
             login=""
@@ -80,6 +82,7 @@ class Upload(object):
             system=Upload._get_system_information("")
             system_specs=system[0]        
             system_id=""
+            #Checks if a similar system is registered and return a link id.
             def _system_check(specs):
                 link=""
                 url="http://www.opengamebenchmarks.org/accounts/profile/"            
@@ -127,8 +130,10 @@ class Upload(object):
                 link=_system_check(system_specs)
                 system_id=re.sub("[^0-9]", "", link)
         
+            #Get the game name to search the id of it in OpenGameBenchmarks.
             conn = sqlite3.connect('ogbatdb.db')
             c=conn.cursor()
+            #A special process in case the of the user had choose to use the voglperf filepath game start method.
             if(game_info[1] != "ns"):            
                 c.execute("SELECT stdb_game,name_game FROM game WHERE stdb_game=?", [game_info[1]])
                 s=0

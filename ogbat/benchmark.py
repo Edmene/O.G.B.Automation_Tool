@@ -16,19 +16,25 @@ class Benchmark(object):
             time.sleep(30+extra_time)
         if(delay == "n"):
             time.sleep(30)                                
+        """When using other key combination to glxosd change the content of key according with
+        the documentation in http://linux.die.net/man/1/xte.
+        """
         keys = '''keydown Shift_L
 key F9
 keyup Shift_L
 '''
+        #Call xte and insert the key combination that is sended system wide.
         p = Popen(['xte'], stdin=PIPE, shell=True)
         p.stdin.write(bytes(keys.encode(encoding='utf_8', errors='strict')))  
         p.stdin.close()
         
+    #End the glxosd benchmark and closes it.
     def _kill_glxosd(self, duration):
         time.sleep(duration)
         Benchmark.keypress(self, "", "")                                                    
         os.system("killall xterm")
         
+    #Deals with the user selection of benchmark tool and game, also start the selected game.
     def _launch_game(self):
         options=["voglperf","glxosd","voglperf executable"]
         wait=""

@@ -18,8 +18,12 @@ class Benchmark(object):
             time.sleep(30+extra_time)
         if(delay == "n"):
             time.sleep(30)
+        """When using other key combination with fraps change the content of key according with
+        the documentation in http://www.developerfusion.com/article/57/sendkeys-command/
+        """
         script.SendKeys("{F11}")
         
+    #Search for the benchmark file in fraps directory.
     def _benchmark_file(self, fraps):
         files=os.listdir(fraps+"benchmarks")
         for a in range (0, len(files)):
@@ -28,6 +32,7 @@ class Benchmark(object):
                 break
         return benchmark_file
     
+    #Get the database game list.
     def _access_db(self):
         installed_games.InstalledGames().games
         conn = sqlite3.connect('ogbatdb.db')
@@ -37,6 +42,7 @@ class Benchmark(object):
         conn.close()
         return games
     
+    #Get the option file information.
     def _read_options(self):
         f = open("options.conf", 'r')
         for line in f:
@@ -51,6 +57,7 @@ class Benchmark(object):
         f.close()
         return fraps, delay 
          
+    #Deals with the user selection of benchmark tool and game, also start the selected game.
     def _launch_game(self):
         wait=""
         g=Benchmark._access_db_db("")        

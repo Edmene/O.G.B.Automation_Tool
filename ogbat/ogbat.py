@@ -2,6 +2,7 @@ import argparse
 import platform
 import system_info
 import benchmark
+#Discover the plataform that is being used to import the windows benchmark class only in the windows enviroment.
 if(platform.system() == "Windows"):
     import benchmark_windows
 import subprocess
@@ -12,6 +13,7 @@ Popen=subprocess.Popen
 parser = argparse.ArgumentParser()
 parser.add_argument("option", help="Select what the tool should do (benchmark[b] or sysinfo[s])")
 args = parser.parse_args()
+#Get the option selected by the user and either show system information or start the benchmark.
 if(args.option == "s"):
     system = system_info.SystemInformations()
     print ("CPU: "+str(system.cpu)+"\nSystem: "+str(system.system)+"\nKernel: "+str(system.kernelV)+"\nMemory: "+str(system.memory)+

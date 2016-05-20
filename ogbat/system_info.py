@@ -99,6 +99,7 @@ class SystemInformations:
             gpuMem=str(int(gpuMem)/1024)+"MB"
             try:            
                 '''
+                ##Old vendor discovery.
                 vendor = str(subprocess.getoutput("lspci -v | grep 'VGA compatible controller:'"))
                 vendor = re.sub("0[0-9].[0-9].\.[0-9] VGA compatible controller*: ", "", vendor)
                 vendor = vendor[0:8]
@@ -116,7 +117,8 @@ class SystemInformations:
                         gpu = str(subprocess.getoutput("nvidia-smi | grep Driver"))
                         gpuDriver = gpu[12:20]
                         gpuDriver=trim_whitespace(gpuDriver)
-                        '''    
+                        '''
+                        ##Old nvidia card discovery.
                         gpu = str(subprocess.getoutput("nvidia-smi | grep GeForce"))
                         gpuCard = gpu[5:27]
                         gpuCard="NVidia "+trim_whitespace(gpuCard)

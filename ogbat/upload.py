@@ -5,6 +5,7 @@ import bs4
 from django.utils.translation import trim_whitespace
 import sqlite3
 import getpass
+import platform
 
 class Upload(object):
     
@@ -58,7 +59,7 @@ class Upload(object):
             else:
                 distro_type=linux_distros_types[7],linux_distros_types_search[7]
         system_information.system=distro_type[0]                
-        system_specs=[system_information.cpu,system_information.gpu[0],system_information.gpu[2],distro_type[1]]
+        system_specs=[system_information.cpu,trim_whitespace(system_information.gpu[0]),system_information.gpu[2],distro_type[1]]
         return system_specs, system_information
         
         
@@ -74,8 +75,12 @@ class Upload(object):
                 csrf = client.get(url).cookies['csrftoken']
                 login_data = dict(username=username, password=password, csrfmiddlewaretoken=csrf)
                 client.post(url, data=login_data, headers=dict(Referer=url))
-                url="http://www.opengamebenchmarks.org/accounts/profile/"            
-                profile=bs4.BeautifulSoup(client.get(url).content, "lxml")
+                url="http://www.opengamebenchmarks.org/accounts/profile/"
+                if(platform.system() != "Windows"):
+                    parser="html.parser"
+                else:
+                    parser="lxml"
+                profile=bs4.BeautifulSoup(client.get(url).content, parser)
                 check=profile.find("table")
                 if(check != None):
                     login="s"                
@@ -86,7 +91,7 @@ class Upload(object):
             def _system_check(specs):
                 link=""
                 url="http://www.opengamebenchmarks.org/accounts/profile/"            
-                info=bs4.BeautifulSoup(client.get(url).content, "lxml")
+                info=bs4.BeautifulSoup(client.get(url).content, parser)
                 tr = info.find_all("tr")
                 for tr in tr:
                     count=0 
@@ -109,19 +114,19 @@ class Upload(object):
             if(len(link) != 0):
                 system_id=re.sub("[^0-9]", "", link)
                 url="http://www.opengamebenchmarks.org/system_edit/"+system_id
-                page=bs4.BeautifulSoup(client.get(url).content, "lxml")
+                page=bs4.BeautifulSoup(client.get(url).content, parser)
                 sys_name = page.find_all("h2")
                 sys_name=trim_whitespace(re.sub("Edit system:", "", str(sys_name)))
                 sys_name=re.sub("\<\/h2\>\]", "", sys_name)
                 sys_name=re.sub("\[\<h2\>", "", sys_name)
                 sys_name=trim_whitespace(sys_name)
                 csrf=client.get(url).cookies['csrftoken']         
-                data = dict(csrfmiddlewaretoken=csrf, descriptive_name=sys_name, cpu_model=system[1].cpu, gpu_model=system[1].gpu[0], dual_gpu="None", resolution=system[1].resolution, driver=system[1].gpu[2],
+                data = dict(csrfmiddlewaretoken=csrf, descriptive_name=sys_name, cpu_model=system[1].cpu, gpu_model=trim_whitespace(system[1].gpu[0]), dual_gpu="None", resolution=system[1].resolution, driver=system[1].gpu[2],
                          operating_system=system[1].system, desktop_environment=system[1].desktop_env, kernel=system[1].kernel_version, gpu_driver_version=system[1].gpu[1], additional_details="VRAM: "+system[1].gpu[3]+"RAM: "+system[1].memory)
                 client.post(url, data=data, headers=dict(Referer=url))
             else:
                 print("\n")
-                system_name=input("Insert a name for your system")
+                system_name=input("Insert a name for your system:")
                 url="http://www.opengamebenchmarks.org/system_add/"
                 csrf=client.get(url).cookies['csrftoken']       
                 data = dict(csrfmiddlewaretoken=csrf, descriptive_name=system_name, cpu_model=system[1].cpu, gpu_model=system[1].gpu[0], dual_gpu="None", resolution=system[1].resolution, driver=system[1].gpu[2],
@@ -129,7 +134,7 @@ class Upload(object):
                 client.post(url, data=data, headers=dict(Referer=url))            
                 link=_system_check(system_specs)
                 system_id=re.sub("[^0-9]", "", link)
-        
+                
             #Get the game name to search the id of it in OpenGameBenchmarks.
             conn = sqlite3.connect('ogbatdb.db')
             c=conn.cursor()
@@ -159,8 +164,8 @@ class Upload(object):
             p = input("Choice: ")
             p=int(p)
             url="http://www.opengamebenchmarks.org/benchmark_add/"
-            csrf=client.get(url).cookies['csrftoken']           
-            info=bs4.BeautifulSoup(client.get(url).content, "lxml")
+            csrf=client.get(url).cookies['csrftoken']
+            info=bs4.BeautifulSoup(client.get(url).content, parser) 
             select = info.find_all("select", {"id": "id_game"})
             for select in select:
                 for option in select.findAll("option"):

@@ -7,10 +7,10 @@ class SystemInformations:
     
     def __init__(self):
         self.system = self._system()        
-        self.kernelV = self._kernel()
+        self.kernel_version = self._kernel()
         self.cpu = self._cpu()
         self.gpu = self._gpu()        
-        self.desktopEnv = self._desktop()
+        self.desktop_env = self._desktop()
         self.memory = self._memory()
         self.resolution = self._resolution()
         
@@ -35,13 +35,13 @@ class SystemInformations:
         
     def _kernel(self):
         if(SystemInformations._platform(self) != "Windows"):
-            kernelV = str(subprocess.getoutput("uname -s")) + " "
-            kernelV = kernelV + str(subprocess.getoutput("uname -r")) + " "
-            kernelV = kernelV + str(subprocess.getoutput("uname -m"))
+            kernel_version = str(subprocess.getoutput("uname -s")) + " "
+            kernel_version = kernel_version + str(subprocess.getoutput("uname -r")) + " "
+            kernel_version = kernel_version + str(subprocess.getoutput("uname -m"))
             
         else:
-            kernelV=""
-        return kernelV       
+            kernel_version=""
+        return kernel_version       
         
     def _cpu(self):
         if(SystemInformations._platform(self) != "Windows"):
@@ -109,6 +109,7 @@ class SystemInformations:
                     gpuCard=str(subprocess.getoutput("grep 'Integrated' /var/log/Xorg.0.log"))
                     gpuCard=re.sub("Integrated Graphics Chipset: ","",gpuCard)
                     gpuCard=re.sub("\(R\)","",gpuCard)
+                    gpuCard="Intel "+gpuCard
                     driverType="Opensource"                
                 if(vendor == "NVIDIA"):
                     gpuCard=str(subprocess.getoutput("grep 'NVIDIA GPU GeF' /var/log/Xorg.0.log"))
@@ -126,7 +127,8 @@ class SystemInformations:
                         driverType="Proprietary"
                     else:
                         gpuDriver=""
-                        driverType="Opensource"  
+                        driverType="Opensource"
+                    gpuCard="NVidia "+gpuCard  
                 else:
                     if(subprocess.getoutput("command -v fglrxinfo >/dev/null 2>&1 || { return 0; }") != 0):
                         gpu = str(subprocess.getoutput("fglrxinfo | grep Radeon"))
@@ -142,7 +144,8 @@ class SystemInformations:
                         gpu=re.sub("^(\[Radeon .*\] )", "", gpu)
                         gpuCard=re.sub("$\[\]","",gpu)
                         driverType="Opensource"
-                        gpuDriver=""                                        
+                        gpuDriver=""
+                    gpuCard="AMD "+gpuCard                                        
             except:
                 if(vendor != "AMD"):
                     vendor = "NVIDIA"    
@@ -165,11 +168,11 @@ class SystemInformations:
     
     def _desktop(self):
         if(SystemInformations._platform(self) != "Windows"):
-            desktopEnv = str(subprocess.getoutput("env | grep 'DESKTOP_SESSION'"))
-            desktopEnv = re.sub("DESKTOP_SESSION=", "", desktopEnv)            
+            desktop_env = str(subprocess.getoutput("env | grep 'DESKTOP_SESSION'"))
+            desktop_env = re.sub("DESKTOP_SESSION=", "", desktop_env)            
         else:
-            desktopEnv=""            
-        return desktopEnv
+            desktop_env=""            
+        return desktop_env
     
     def _resolution(self):
         width=0

@@ -20,7 +20,9 @@ class Upload(object):
                     'Slackware-based','Mandriva-based','Linux-other'] 
         linux_distros_types_search=['Debian-based \(Debian\, Ubuntu\, Mint\, Elementary OS\, SteamOS\)','Arch-based \(Arch\, Manjaro\)',
                     'Red Hat-based \(RedHat\, Fedora\, CentOS\)','Gentoo-based \(Gentoo\, Chromium\, Funtoo\)','SUSE-based',
-                    'Slackware-based','Mandriva-based','Linux-other']   
+                    'Slackware-based','Mandriva-based','Linux-other']
+        windows_versions=['Windows 10','Windows 8','Windows 7','Windows Vista','Windows XP','Windows-other'] 
+        windows_versions_search=['Windows\ 10','Windows\ 8','Windows\ 7','Windows\ Vista','Windows\ XP','Windows-other']
         system_information=system_info.SystemInformations()
         distro_type=system_information.system
         if(re.search("Windows", distro_type) == None):
@@ -58,6 +60,19 @@ class Upload(object):
                 distro_type=[linux_distros_types[6],linux_distros_types_search[6]]           
             else:
                 distro_type=linux_distros_types[7],linux_distros_types_search[7]
+        else:
+            if(re.search("10", distro_type) != None):
+                distro_type=[windows_versions[0],windows_versions_search[0]]
+            elif(re.search("8", distro_type) != None):
+                distro_type=[windows_versions[1],windows_versions_search[1]]
+            elif(re.search("7", distro_type) != None):
+                distro_type=[windows_versions[2],windows_versions_search[2]]
+            elif(re.search("vista", distro_type) != None and re.search("VISTA", distro_type) != None):
+                distro_type=[windows_versions[3],windows_versions_search[3]]
+            elif(re.search("XP", distro_type) != None):
+                distro_type=[windows_versions[4],windows_versions_search[4]]
+            else:
+                distro_type=[linux_distros_types[5],linux_distros_types_search[5]]
         system_information.system=distro_type[0]                
         system_specs=[system_information.cpu,trim_whitespace(system_information.gpu[0]),system_information.gpu[2],distro_type[1]]
         return system_specs, system_information
@@ -76,7 +91,7 @@ class Upload(object):
                 login_data = dict(username=username, password=password, csrfmiddlewaretoken=csrf)
                 client.post(url, data=login_data, headers=dict(Referer=url))
                 url="http://www.opengamebenchmarks.org/accounts/profile/"
-                if(platform.system() != "Windows"):
+                if(platform.system() == "Windows"):
                     parser="html.parser"
                 else:
                     parser="lxml"
@@ -122,15 +137,15 @@ class Upload(object):
                 sys_name=trim_whitespace(sys_name)
                 csrf=client.get(url).cookies['csrftoken']         
                 data = dict(csrfmiddlewaretoken=csrf, descriptive_name=sys_name, cpu_model=system[1].cpu, gpu_model=trim_whitespace(system[1].gpu[0]), dual_gpu="None", resolution=system[1].resolution, driver=system[1].gpu[2],
-                         operating_system=system[1].system, desktop_environment=system[1].desktop_env, kernel=system[1].kernel_version, gpu_driver_version=system[1].gpu[1], additional_details="VRAM: "+system[1].gpu[3]+"RAM: "+system[1].memory)
+                    operating_system=system[1].system, desktop_environment=system[1].desktop_env, kernel=system[1].kernel_version, gpu_driver_version=str(system[1].gpu[1]), additional_details="VRAM: "+str(system[1].gpu[3])+"RAM: "+str(system[1].memory))
                 client.post(url, data=data, headers=dict(Referer=url))
             else:
                 print("\n")
                 system_name=input("Insert a name for your system:")
                 url="http://www.opengamebenchmarks.org/system_add/"
                 csrf=client.get(url).cookies['csrftoken']       
-                data = dict(csrfmiddlewaretoken=csrf, descriptive_name=system_name, cpu_model=system[1].cpu, gpu_model=system[1].gpu[0], dual_gpu="None", resolution=system[1].resolution, driver=system[1].gpu[2],
-                         operating_system=system[1].system, desktop_environment=system[1].desktop_env, kernel=system[1].kernel_version, gpu_driver_version=system[1].gpu[1], additional_details="VRAM: "+system[1].gpu[3]+"RAM: "+system[1].memory)
+                data = dict(csrfmiddlewaretoken=csrf, descriptive_name=system_name, cpu_model=system[1].cpu, gpu_model=trim_whitespace(system[1].gpu[0]), dual_gpu="None", resolution=system[1].resolution, driver=system[1].gpu[2],
+                    operating_system=system[1].system, desktop_environment=system[1].desktop_env, kernel=system[1].kernel_version, gpu_driver_version=str(system[1].gpu[1]), additional_details="VRAM: "+str(system[1].gpu[3])+"RAM: "+str(system[1].memory))
                 client.post(url, data=data, headers=dict(Referer=url))            
                 link=_system_check(system_specs)
                 system_id=re.sub("[^0-9]", "", link)

@@ -68,7 +68,6 @@ class Upload(object):
                 distro_type=[windows[5],windows[5]]
         system_information.system=distro_type[0]                
         system_specs=[system_information.cpu,trim_whitespace(system_information.gpu[0]),system_information.gpu[2],distro_type[1]]
-        print(system_information)
         return system_specs, system_information
         
         
@@ -190,7 +189,6 @@ class Upload(object):
                         game_option=trim_whitespace(re.sub(replace[a+3], "", game_option))
                     if(re.fullmatch(g[0][1], game_option_name) != None):
                         break
-            print(game_option+" "+game_option_name)
             file=open(game_info[0], 'rb')            
             data = dict(csrfmiddlewaretoken=csrf, game=game_option, user_system=system_id, frames_file={game_info[0]: file}, game_quality_preset=preset[p], additional_notes=benchmark_notes)
             client.post(url, data=data, headers=dict(Referer=url))

@@ -15,66 +15,60 @@ class Upload(object):
         
     #Set the system type in the right format for OpenGameBenchmarks.
     def _get_system_information(self):
-        linux_distros_types=['Debian-based (Debian, Ubuntu, Mint, Elementary OS, SteamOS)','Arch-based (Arch, Manjaro)',
-                    'Red Hat-based (RedHat, Fedora, CentOS)','Gentoo-based (Gentoo, Chromium, Funtoo)','SUSE-based',
-                    'Slackware-based','Mandriva-based','Linux-other'] 
-        linux_distros_types_search=['Debian-based \(Debian\, Ubuntu\, Mint\, Elementary OS\, SteamOS\)','Arch-based \(Arch\, Manjaro\)',
-                    'Red Hat-based \(RedHat\, Fedora\, CentOS\)','Gentoo-based \(Gentoo\, Chromium\, Funtoo\)','SUSE-based',
-                    'Slackware-based','Mandriva-based','Linux-other']
-        windows_versions=['Windows 10','Windows 8','Windows 7','Windows Vista','Windows XP','Windows-other'] 
-        windows_versions_search=['Windows\ 10','Windows\ 8','Windows\ 7','Windows\ Vista','Windows\ XP','Windows-other']
+        linux=[["Debian-based (Debian, Ubuntu, Mint, Elementary OS, SteamOS)","Debian-based \(Debian\, Ubuntu\, Mint\, Elementary OS\, SteamOS\)",
+                ["Debian","Ubuntu","Mint","Elementary","Steam"]],
+               ["Arch-based (Arch, Manjaro)","Arch-based \(Arch\, Manjaro\)",
+                ["Arch","Manjaro",]],
+               ["Red Hat-based (RedHat, Fedora, CentOS)","Red Hat-based \(RedHat\, Fedora\, CentOS\)",
+                ["RedHat","RHEL","Fedora","Cent"]],
+               ["Gentoo-based (Gentoo, Chromium, Funtoo)","Gentoo-based \(Gentoo\, Chromium\, Funtoo\)",
+                ["Gentoo","Chromium","Funtoo"]],
+               ["SUSE-based","SUSE-based",
+                ["SUSE"]],
+               ["Slackware-based","Slackware-based",
+                ["Slack"]],
+               ["Mandriva-based","Mandriva-based",
+                ["Mageia"]],
+               "Linux-other"]
+        windows=[["Windows 10","Windows\ 10",
+                ["10"]],
+               ["Windows 8","Windows\ 8",
+                ["8"]],
+               ["Windows 7","Windows\ 7",
+                ["7"]],
+               ["Windows Vista","Windows\ Vista",
+                ["vista","VISTA"]],
+               ["Windows XP","Windows\ XP",
+                ["XP"]],
+               "Windows-other"]
         system_information=system_info.SystemInformations()
         distro_type=system_information.system
+        check=0
         if(re.search("Windows", distro_type) == None):
-            if(re.search("Debian", distro_type) != None):
-                distro_type=[linux_distros_types[0],linux_distros_types_search[0]]
-            elif(re.search("Ubuntu", distro_type) != None):
-                distro_type=[linux_distros_types[0],linux_distros_types_search[0]]
-            elif(re.search("Mint", distro_type) != None):
-                distro_type=[linux_distros_types[0],linux_distros_types_search[0]]
-            elif(re.search("Elementary", distro_type) != None):
-                distro_type=[linux_distros_types[0],linux_distros_types_search[0]]
-            elif(re.search("Steam", distro_type) != None):
-                distro_type=[linux_distros_types[0],linux_distros_types_search[0]]
-            elif(re.search("Arch", distro_type) != None):
-                distro_type=[linux_distros_types[1],linux_distros_types_search[1]]
-            elif(re.search("Manjaro", distro_type) != None):
-                distro_type=[linux_distros_types[1],linux_distros_types_search[1]]
-            elif(re.search("RedHat", distro_type) != None and re.search("RHEL", distro_type) != None):
-                distro_type=[linux_distros_types[2],linux_distros_types_search[2]]
-            elif(re.search("Fedora", distro_type) != None):
-                distro_type=[linux_distros_types[2],linux_distros_types_search[2]]
-            elif(re.search("Cent", distro_type) != None):
-                distro_type=[linux_distros_types[2],linux_distros_types_search[2]]
-            elif(re.search("Gentoo", distro_type) != None):
-                distro_type=[linux_distros_types[3],linux_distros_types_search[3]]
-            elif(re.search("Chromium", distro_type) != None):
-                distro_type=[linux_distros_types[3],linux_distros_types_search[3]]
-            elif(re.search("Funtoo", distro_type) != None):
-                distro_type=[linux_distros_types[3],linux_distros_types_search[3]]
-            elif(re.search("SUSE", distro_type) != None):
-                distro_type=[linux_distros_types[4],linux_distros_types_search[4]]
-            elif(re.search("Slack", distro_type) != None):
-                distro_type=[linux_distros_types[5],linux_distros_types_search[5]]
-            elif(re.search("Mageia", distro_type) != None):
-                distro_type=[linux_distros_types[6],linux_distros_types_search[6]]           
-            else:
-                distro_type=linux_distros_types[7],linux_distros_types_search[7]
+            for a in range(0, (len(linux)-1)):
+                for i in range(0, len(linux[a][2])):
+                    if(re.search(linux[a][2][i], distro_type) != None):
+                        distro_type=[linux[a][0],linux[a][1]]
+                        check=1
+                        break
+                if(check==1):
+                    break
+            if(check==0):
+                distro_type=[linux[7],linux[7]]
         else:
-            if(re.search("10", distro_type) != None):
-                distro_type=[windows_versions[0],windows_versions_search[0]]
-            elif(re.search("8", distro_type) != None):
-                distro_type=[windows_versions[1],windows_versions_search[1]]
-            elif(re.search("7", distro_type) != None):
-                distro_type=[windows_versions[2],windows_versions_search[2]]
-            elif(re.search("vista", distro_type) != None and re.search("VISTA", distro_type) != None):
-                distro_type=[windows_versions[3],windows_versions_search[3]]
-            elif(re.search("XP", distro_type) != None):
-                distro_type=[windows_versions[4],windows_versions_search[4]]
-            else:
-                distro_type=[linux_distros_types[5],linux_distros_types_search[5]]
+            for a in range(0, (len(windows)-1)):
+                for i in range(0, len(windows[a][2])):
+                    if(re.search(windows[a][2][i], distro_type) != None):
+                        distro_type=[windows[a][0],windows[a][1]]
+                        check=1
+                        break
+                if(check==1):
+                    break
+            if(check==0):
+                distro_type=[windows[5],windows[5]]
         system_information.system=distro_type[0]                
         system_specs=[system_information.cpu,trim_whitespace(system_information.gpu[0]),system_information.gpu[2],distro_type[1]]
+        print(system_information)
         return system_specs, system_information
         
         
@@ -182,21 +176,21 @@ class Upload(object):
             csrf=client.get(url).cookies['csrftoken']
             info=bs4.BeautifulSoup(client.get(url).content, parser) 
             select = info.find_all("select", {"id": "id_game"})
+            replace=['<option value.*">',"<\/option>","b'",'<option value="','".*',"b'"]
             for select in select:
                 for option in select.findAll("option"):
                     game_option_name=str(option.encode(encoding='ascii', errors='ignore'))
-                    game_option_name=re.sub('<option value.*">', "", game_option_name)
-                    game_option_name=re.sub("<\/option>", "", game_option_name)
-                    game_option_name=re.sub("b'", "", game_option_name)
+                    for a in range(0, 3):
+                        game_option_name=re.sub(replace[a], "", game_option_name)                    
                     game_option_name=re.sub("\\\\'s", "'s", game_option_name)
                     game_option_name=re.sub("\\\\'S", "'S", game_option_name)
                     game_option_name=game_option_name[0:len(game_option_name)-1]               
                     game_option=str(option.encode(encoding='ascii', errors='ignore'))
-                    game_option=trim_whitespace(re.sub('<option value="', "", game_option))
-                    game_option=re.sub('".*', "", game_option)
-                    game_option=re.sub("b'", "", game_option)
+                    for a in range(0, 3):
+                        game_option=trim_whitespace(re.sub(replace[a+3], "", game_option))
                     if(re.fullmatch(g[0][1], game_option_name) != None):
                         break
+            print(game_option+" "+game_option_name)
             file=open(game_info[0], 'rb')            
             data = dict(csrfmiddlewaretoken=csrf, game=game_option, user_system=system_id, frames_file={game_info[0]: file}, game_quality_preset=preset[p], additional_notes=benchmark_notes)
             client.post(url, data=data, headers=dict(Referer=url))

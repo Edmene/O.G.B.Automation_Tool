@@ -54,7 +54,7 @@ class Upload(object):
                 if(check==1):
                     break
             if(check==0):
-                distro_type=[linux[7],linux[7]]
+                distro_type=[linux[(len(linux)-1)],linux[(len(linux)-1)]]
         else:
             for a in range(0, (len(windows)-1)):
                 for i in range(0, len(windows[a][2])):
@@ -65,7 +65,7 @@ class Upload(object):
                 if(check==1):
                     break
             if(check==0):
-                distro_type=[windows[5],windows[5]]
+                distro_type=[windows[(len(windows)-1)],windows[(len(windows)-1)]]
         system_information.system=distro_type[0]                
         system_specs=[system_information.cpu,trim_whitespace(system_information.gpu[0]),system_information.gpu[2],distro_type[1]]
         return system_specs, system_information

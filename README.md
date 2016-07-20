@@ -5,7 +5,7 @@
 <p>This tool was created to with the goal of automate the upload of benchmarks to Open_Game_Benchmarks, for it need to get general system information that is especified in the site of OGB and the amount of RAM and VRAM in the system. Also launch the game+benchmark tool, the aplications are terminated after the conclusion of the benchmark in Linux, using it in Windows the applications remain open after the end of benchmark. Informations about what is needed to implement in the tool are in <a href="https://github.com/Edmene/O.G.B.Automation_Tool/issues" target="new">issues</a>. Please visit <a href="https://github.com/wbasile/Open-Game-Benchmarks" target="new">Open_Game_Benchmark</a> to know more about the project.</p>
 
 <h3>How use GLXOSD with OGBAT</h3>
-<p>The current version of the tool requires that in the game option launch options is set with "glxosd --steam %command%" as in the instructions of how to use glxosd and then launch ogbat.py. Also the game isn't finished upon the end of the benchmark.</p> 
+<p>The current version of the tool requires that in the game option, launch options is set with "glxosd --steam %command%" as in the instructions of how to use glxosd and then launch ogbat.py. Also the game isn't finished upon the end of the benchmark.</p> 
 
 
 <h2>What is need to make the tool work</h2>

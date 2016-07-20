@@ -40,10 +40,9 @@ keyup Shift_L
             script.SendKeys(keys)
         
     #End the glxosd benchmark and closes it.
-    def _kill_glxosd(self, duration):
+    def _stop_glxosd(self, duration):
         time.sleep(duration)
-        Benchmark.keypress(self, "", "")                                                    
-        os.system("killall xterm")
+        Benchmark.keypress(self, "", "")
         
     def _benchmark_file(self, tool_path):
         if(platform.system() == "Windows"):
@@ -142,12 +141,12 @@ keyup Shift_L
                             if(m == 1):
                                 game_id=str(g[s][0])                                                   
                                 def _glxosd():
-                                    Popen(["xterm -e glxosd -s steam steam://rungameid/"+str(g[s][0])], stdin=PIPE, shell=True)                                                      
+                                    Popen(["steam steam://run/"+str(g[s][0])], stdin=PIPE, shell=True)                                                      
                                 if(wait == "y"):
                                     t=t+file_content[1]
                                 threading.Thread(target=_glxosd())                                                         
                                 Benchmark.keypress(self, wait, file_content[1])
-                                threading.Thread(target=Benchmark._kill_glxosd(self, t))
+                                threading.Thread(target=Benchmark._stop_glxosd(self, t))
                             if(m == 2):
                                 game_id="ns"
                                 exec_path=input("Type the path to the game executable:") 

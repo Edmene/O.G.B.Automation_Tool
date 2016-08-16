@@ -19,30 +19,13 @@ class Benchmark(object):
             time.sleep(30+extra_time)
         if(delay == "n"):
             time.sleep(30)                                
-        """When using other key combination to glxosd, change the content of key according with
-        the documentation in http://linux.die.net/man/1/xte.
-        
-        When using other key combination with fraps, change the content of key according with
+        """When using other key combination with fraps, change the content of key according with
         the documentation in http://www.developerfusion.com/article/57/sendkeys-command/
         """        
-        #Call xte and insert the key combination that is sended system wide.
-        if(platform.system() != "Windows"):
-            keys = '''keydown Shift_L
-key F9
-keyup Shift_L
-'''
-            p = Popen(['xte'], stdin=PIPE, shell=True)
-            p.stdin.write(bytes(keys.encode(encoding='utf_8', errors='strict')))  
-            p.stdin.close()
-        else:
-            keys="{F11}"
-            script = win32com.client.Dispatch("WScript.Shell")
-            script.SendKeys(keys)
-        
-    #End the glxosd benchmark and closes it.
-    def _stop_glxosd(self, duration):
-        time.sleep(duration)
-        Benchmark.keypress(self, "", "")
+        #Call insert the key combination that is sended system wide.
+        keys="{F11}"
+        script = win32com.client.Dispatch("WScript.Shell")
+        script.SendKeys(keys)
         
     def _benchmark_file(self, tool_path):
         if(platform.system() == "Windows"):
@@ -91,7 +74,7 @@ keyup Shift_L
         
     #Deals with the user selection of benchmark tool and game, also start the selected game.
     def _launch_game(self):
-        options=["voglperf","glxosd","voglperf executable"]        
+        options=["voglperf","voglperf executable"]        
         wait=""
         m=-1
         installed_games.InstalledGames().games        
@@ -139,15 +122,6 @@ keyup Shift_L
                                 sb.terminate()
                                 os.system("killall xterm")
                             if(m == 1):
-                                game_id=str(g[s][0])                                                   
-                                def _glxosd():
-                                    Popen(["steam steam://run/"+str(g[s][0])], stdin=PIPE, shell=True)                                                      
-                                if(wait == "y"):
-                                    t=t+file_content[1]
-                                threading.Thread(target=_glxosd())                                                         
-                                Benchmark.keypress(self, wait, file_content[1])
-                                threading.Thread(target=Benchmark._stop_glxosd(self, t))
-                            if(m == 2):
                                 game_id="ns"
                                 exec_path=input("Type the path to the game executable:") 
                                 if(wait == "n"):

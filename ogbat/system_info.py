@@ -96,6 +96,8 @@ class SystemInformations:
             gpuMem=re.sub("\(.*\):", "", gpuMem)
             gpuMem=trim_whitespace(re.sub("Memory: ", "", gpuMem))
             gpuMem=re.sub("k.*", "", gpuMem)
+            if(len(gpuMem) == 0):
+                gpuMem="0"
             gpuMem=str(int(gpuMem)/1024)+"MB"
             try:            
                 '''
@@ -106,12 +108,22 @@ class SystemInformations:
                 vendor = re.sub(" .*","",vendor)       
                 '''            
                 if(vendor == "Intel"):
-                    gpuCard=str(subprocess.getoutput("grep 'Integrated' /var/log/Xorg.0.log"))
-                    gpuCard=re.sub("Integrated Graphics Chipset: ","",gpuCard)
-                    gpuCard=re.sub("\(R\)","",gpuCard)
-                    gpuCard="Intel "+gpuCard
+                    gpuCard=str(subprocess.getoutput("grep '(--) intel(0): Integrated' /var/log/Xorg.0.log"))
+                    intelReplace=["Integrated Graphics Chipset: ","\(R\)","\[    [0-9][0-9].[0-9][0-9][0-9]\] \(--\) intel\(0\): ",
+                                                     "OpenGL version string:"," [0-9].[0-9]","Video memory:"," "]
+                    for a in range(0,3):                    
+                        gpuCard=re.sub(intelReplace[a],"",gpuCard)
+                    if(subprocess.getoutput("command -v glxinfo >/dev/null 2>&1 || { return 0; }") != 0):
+                        gpuDriver=str(subprocess.getoutput("glxinfo | grep 'OpenGL version string'"))
+                        for a in range(0, 2):
+                            gpuDriver=re.sub(intelReplace[a+3], "", gpuDriver)                        
+                        gpuMem=str(subprocess.getoutput("glxinfo | grep 'Video memory:'"))
+                        for a in range(0, 2):
+                            gpuMem=re.sub(intelReplace[a+5], "", gpuMem)
+                    else:                    
+                        gpuDriver="Unknow"
                     driverType="Opensource"                
-                if(vendor == "NVIDIA"):
+                elif(vendor == "NVIDIA"):
                     gpuCard=str(subprocess.getoutput("grep 'NVIDIA GPU GeF' /var/log/Xorg.0.log"))
                     gpuCard=gpuCard[40:56]                                
                     if(subprocess.getoutput("command -v nvidia-smi >/dev/null 2>&1 || { return 0; }") != 0):
@@ -162,8 +174,7 @@ class SystemInformations:
             gpuDriver=re.sub("DriverVersion", "", subprocess.getoutput("wmic path win32_VideoController get DriverVersion"))
             gpuDriver=re.sub("\n","",gpuDriver)
             gpuCard=trim_whitespace(gpuCard)
-            driverType="Proprietary"
-            gpu=[gpuCard,gpuDriver,gpuMem,driverType]                  
+            driverType="Proprietary"                
         return gpuCard,gpuDriver,driverType,gpuMem
     
     def _desktop(self):
